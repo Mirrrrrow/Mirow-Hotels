@@ -196,6 +196,7 @@ function openRoomMenu(hotelRoom,price)
         ESX.TextUI("You did not enter the correct text", "error") 
         Wait(3500)
         ESX.HideUI()
+        return
     end
     if string.lower(retval) == "confirm" then
         ESX.TriggerServerCallback('hotel:rentRoom', function(data) 
