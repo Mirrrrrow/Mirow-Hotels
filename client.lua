@@ -158,7 +158,7 @@ function openMainMenu()
             roomItemOwn:RightLabel("~b~"..hotelRoom)
             mainMenu:AddItem(roomItemOwn)
             roomItemOwn.Activated = function(sender, item, index)
-                openRoomMenu(hotelRoom,hotelPrice)
+                openRoomManager(hotelRoom,hotelPrice)
             end
 
         end
@@ -227,6 +227,8 @@ function openRoomMenu(hotelRoom,price)
     end
 end
 
+local developer = false
+
 function openRoomManager(hotelRoom, price)
     local roomManagerMenu = NativeUI.CreateMenu("Room " ..tostring(hotelRoom), "Welcome to the room manager, select an option")
     _menuPool:Add(roomManagerMenu)
@@ -239,10 +241,14 @@ function openRoomManager(hotelRoom, price)
 
     local minibarItem = NativeUI.CreateItem("Minibar managment", "~b~")
     roomManagerMenu:AddItem(minibarItem)
-    --minibarItem:RightLabel("~b~>>>")
+    if developer then
+        minibarItem:RightLabel("~b~>>>")
+    else
+        minibarItem:SetRightBadge(21)
+        minibarItem:Enabled(false)
+    end
     -- Set the Badge to minibaritem 21
-    minibarItem:SetRightBadge(21)
-    minibarItem:Enabled(false)
+
 
     local placeholder = NativeUI.CreateItem('', '')
     roomManagerMenu:AddItem(placeholder)
@@ -271,6 +277,9 @@ function openRoomManager(hotelRoom, price)
             menu:Visible(false)
             menu = {}
             openMainMenu()
+        end
+        if item == minibarItem then
+            openMinibarMenu(hotelRoom, price)
         end
         if item == locateItem then
             ESX.TriggerServerCallback('hotel:getRoomPosition', function(x,y,z) 
@@ -318,6 +327,90 @@ function openRoomManager(hotelRoom, price)
     end
 
 end
+
+function openMinibarMenu(hotelroom,price)
+    local minibarMenu = NativeUI.CreateMenu("Room " ..tostring(hotelroom), "Welcome to the minibar, select an option")
+    _menuPool:Add(minibarMenu)
+    ESX.TriggerServerCallback('hotel:getMinibar', function(minibar) 
+        for _, value in pairs(minibar) do
+            local item = NativeUI.CreateItem(value.label, "~b~")
+            minibarMenu:AddItem(item)
+            local zero = (value.amount == 0)
+            local color = (zero and "~r~" or "~g~")
+            item:RightLabel(color ..tostring(value.amount))
+            item.Activated = function(sender, item, index)
+                openMinibarItemmenu(hotelroom,price,value.label, value.cost, value.name)
+            end
+        end
+        local placeholder = NativeUI.CreateItem('', '')
+        minibarMenu:AddItem(placeholder)
+
+        local backItem = NativeUI.CreateItem("Back", "~b~")
+        minibarMenu:AddItem(backItem)
+        backItem:RightLabel("~b~>>>")
+        minibarMenu.OnItemSelect = function(sender, item, index)
+            if item == backItem then
+                menu:Visible(false)
+                openRoomManager(hotelroom,price)
+            end
+        end
+        _menuPool:RefreshIndex()
+        _menuPool:MouseControlsEnabled(false)
+        menu:Visible(false)
+        minibarMenu:Visible(true)       
+        menu = minibarMenu 
+    end, hotelroom)
+
+end
+
+function openMinibarItemmenu(hotelroom,hotprice,label,price,name)
+    local itemMenu = NativeUI.CreateMenu("Room " ..tostring(hotelroom), "Welcome to the minibar, select an option")
+    _menuPool:Add(itemMenu)
+
+    local buyOne = NativeUI.CreateItem("Buy 1x " ..label, "~b~")
+    itemMenu:AddItem(buyOne)
+    buyOne:RightLabel("~b~$" ..tostring(price))
+
+    local buyTen = NativeUI.CreateItem("Buy 10x " ..label, "~b~")
+    itemMenu:AddItem(buyTen)
+    buyTen:RightLabel("~b~$" ..tostring(price*10))
+
+    local placeholder = NativeUI.CreateItem('', '')
+    itemMenu:AddItem(placeholder)
+
+    local backItem = NativeUI.CreateItem("Back", "~b~")
+    itemMenu:AddItem(backItem)
+    backItem:RightLabel("~b~>>>")
+
+    itemMenu.OnItemSelect = function(sender, item, index)
+        if item == backItem then
+            itemMenu:Visible(false)
+            openMinibarMenu(hotelroom,hotprice)
+        end
+        if item == buyOne then
+            itemMenu:Visible(false)
+            TriggerServerEvent('hotel:buyMinibarItem', hotelroom, name, 1, price)
+            Wait(350)
+            openMinibarMenu(hotelroom,hotprice)
+
+        end
+        if item == buyTen then
+            itemMenu:Visible(false)
+            TriggerServerEvent('hotel:buyMinibarItem', hotelroom, name, 10, price*10)
+            Wait(350)
+            openMinibarMenu(hotelroom,hotprice)
+
+        end
+    end
+
+    _menuPool:RefreshIndex()
+    _menuPool:MouseControlsEnabled(false)
+    menu:Visible(false)
+    itemMenu:Visible(true)       
+    menu = itemMenu 
+
+end
+
 
 function KeyboardInput(TextEntry, ExampleText, MaxStringLenght)
 

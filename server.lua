@@ -182,3 +182,35 @@ end, true, {help = "Creates a Hotel Room", arguments = {
     {name = "number", help = "The ID of the Room (Unique)", type = "number"},
     {name = "price", help = "The Price of the Room", type = "number"},
 }})
+
+RegisterServerEvent('hotel:buyMinibarItem')
+AddEventHandler('hotel:buyMinibarItem', function(hotelroom,name,count,price)
+    local __source = source
+    local xPlayer = ESX.GetPlayerFromId(__source)
+    if xPlayer.getMoney() >= tonumber(price) then
+        MySQL.query(query3, {tonumber(hotelroom)}, function(result)
+            local room = result[1]
+            if room.owner == xPlayer.identifier then
+                local minibar = json.decode(room.minibar)
+                for k,v in pairs(minibar) do
+                    if v.name == name then
+                        v.amount = v.amount + count
+                    end
+                end
+                xPlayer.removeMoney(tonumber(price))
+                MySQL.query("UPDATE hotels SET minibar = ? WHERE id = ?", {json.encode(minibar), hotelroom})
+                TriggerClientEvent('ESX:TextUI', __source, "You bought " ..tostring(count).. "x " ..tostring(name).. " for $" ..tostring(price), "success")
+                Wait(3500)
+                TriggerClientEvent('ESX:HideUI', __source)
+            else
+                TriggerClientEvent('ESX:TextUI', __source, "You don't own this room", "error")
+                Wait(3500)
+                TriggerClientEvent('ESX:HideUI', __source)
+            end
+        end)
+    else
+        TriggerClientEvent('ESX:TextUI', __source, "You don't have enough money", "error")
+        Wait(3500)
+        TriggerClientEvent('ESX:HideUI', __source)
+    end 
+end)
