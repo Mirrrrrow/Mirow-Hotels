@@ -192,6 +192,11 @@ function openRoomMenu(hotelRoom,price)
     local retval = KeyboardInput('Enter "CONFIRM" to rent the Room ' ..tostring(hotelRoom).. " for $" ..tostring(price).. " / Payday", "", 7)
     menu:Visible(false)
     menu = {}
+    if retval == nil then 
+        ESX.TextUI("You did not enter the correct text", "error") 
+        Wait(3500)
+        ESX.HideUI()
+    end
     if string.lower(retval) == "confirm" then
         ESX.TriggerServerCallback('hotel:rentRoom', function(data) 
             if data == "success" then
@@ -216,6 +221,8 @@ function openRoomMenu(hotelRoom,price)
         end,hotelRoom,price)
     else
         ESX.TextUI("You did not enter the correct text", "error")
+        Wait(3500)
+        ESX.HideUI()
     end
 end
 
