@@ -266,9 +266,6 @@ function openRoomManager(hotelRoom, price)
     menu = roomManagerMenu 
 
     roomManagerMenu.OnItemSelect = function(sender, item, index)
-        if minibarItem == item then
-            --openMinibarMenu(hotelRoom, price)
-        end
         if item == backItem then
             menu:Visible(false)
             menu = {}
