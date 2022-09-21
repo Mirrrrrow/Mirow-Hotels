@@ -29,10 +29,6 @@ AddEventHandler('hotel:loadCurrentRoom', function(roomId)
     currentRoom = roomId
 end)
 
-RegisterCommand('test', function()
-    print(currentRoom)
-end)
-
 local enterSend = false
 local exitSend = false
 CreateThread(function()
