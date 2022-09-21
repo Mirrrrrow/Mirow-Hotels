@@ -214,3 +214,24 @@ AddEventHandler('hotel:buyMinibarItem', function(hotelroom,name,count,price)
         TriggerClientEvent('ESX:HideUI', __source)
     end 
 end)
+
+RegisterServerEvent('hotel:removeMinibarItem')
+AddEventHandler('hotel:removeMinibarItem', function(hotelroom,name,label)
+    local __source = source
+    local xPlayer = ESX.GetPlayerFromId(__source)
+    MySQL.query(query3, {hotelroom}, function(result)
+        local room = result[1]
+        local minibar = json.decode(room.minibar)
+        for index,value in pairs(minibar) do
+            if value.name == name then
+                value.amount = value.amount - 1
+            end 
+        end
+        MySQL.query("UPDATE hotels SET minibar = ? WHERE id = ?", {json.encode(minibar), hotelroom})
+        xPlayer.addInventoryItem(name, 1)
+        TriggerClientEvent('ESX:TextUI', __source, "You took 1x " ..tostring(label).. " out of the minibar.", "success")
+        Wait(3500)
+        TriggerClientEvent('ESX:HideUI', __source)
+
+    end)
+end)

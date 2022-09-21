@@ -67,7 +67,19 @@ CreateThread(function()
             local playerCoords = GetEntityCoords(player)
             local hotelPosition = Config.HotelData.interrior.position
             local distance = #(playerCoords - vector3(hotelPosition.x, hotelPosition.y, hotelPosition.z))
+            if Config.HotelData.interrior.useMinibar then
+                if #(playerCoords - Config.HotelData.interrior.minibarPosition) < 30.0 then 
+                    DrawMarker(1, Config.HotelData.interrior.minibarPosition.x, Config.HotelData.interrior.minibarPosition.y, Config.HotelData.interrior.minibarPosition.z - 0.95, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0.5, 255, 255, 255, 100, 0, 0, 0, 0)
+                    if #(playerCoords - Config.HotelData.interrior.minibarPosition) <= 2.0 then
+                        if IsControlJustPressed(0, 38) then
+                            OpenMinibar(hotel.id)
+                        end
+                    end
+                end
+            end
+
             if distance <= 15.0 then
+
                 DrawMarker(1, hotelPosition.x, hotelPosition.y, hotelPosition.z - 0.95, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0.5, 255, 255, 255, 100, 0, 0, 0, 0)
             end 
             if distance <= 2.0 then 
@@ -141,6 +153,8 @@ CreateThread(function()
     end
 end)
 
+
+
 function openMainMenu()
     local mainMenu = NativeUI.CreateMenu("Hotel", "Welcome to the hotel, select an option")
     _menuPool:Add(mainMenu)
@@ -184,6 +198,8 @@ function openMainMenu()
     end)
 end
 
+
+
 function openRoomMenu(hotelRoom,price)
     local retval = KeyboardInput('Enter "CONFIRM" to rent the Room ' ..tostring(hotelRoom).. " for $" ..tostring(price).. " / Payday", "", 7)
     menu:Visible(false)
@@ -223,7 +239,87 @@ function openRoomMenu(hotelRoom,price)
     end
 end
 
-local developer = false
+function OpenMinibar(hotelroom)
+    local minibarMenu = NativeUI.CreateMenu("Room " ..tostring(hotelroom), "Welcome to the minibar, select an item")
+    _menuPool:Add(minibarMenu)
+    ESX.TriggerServerCallback('hotel:getMinibar', function(minibar) 
+        for _, value in pairs(minibar) do
+            local minibarItem = NativeUI.CreateItem(value.label, "~b~")
+            local zero = (value.amount == 0)
+            local color = (zero and "~r~" or "~g~")
+            minibarItem:RightLabel(color..value.amount)
+            minibarMenu:AddItem(minibarItem)
+            minibarItem.Activated = function(sender, item, index)
+                OpenMinibarItem(hotelroom,value.name,value.label,value.amount)
+                minibarMenu:Visible(false)
+            end
+
+        end 
+
+        _menuPool:RefreshIndex()
+        _menuPool:MouseControlsEnabled(false)
+        menu = minibarMenu 
+        menu:Visible(false)
+        menu = {}
+        minibarMenu:Visible(true)       
+    end, hotelroom)
+end
+
+function OpenMinibarItem(hotelroom,name,label,amount)
+    local minibarCustomItem = NativeUI.CreateMenu("Room " ..tostring(hotelroom), "Welcome to the minibar, select an item")
+    _menuPool:Add(minibarCustomItem)
+
+    local zero = (amount == 0)
+    local color = (zero and "~r~" or "~g~")
+
+    local ammountitem = NativeUI.CreateItem("Amount:", "~b~")
+    ammountitem:RightLabel(color..amount)
+    minibarCustomItem:AddItem(ammountitem)
+
+    local removeItem = NativeUI.CreateItem("Take 1x " ..label, "~b~")
+    minibarCustomItem:AddItem(removeItem)
+
+    local placeholder = NativeUI.CreateItem('', '')
+    minibarCustomItem:AddItem(placeholder)
+
+    local backItem = NativeUI.CreateItem("Back", "~b~")
+    minibarCustomItem:AddItem(backItem)
+    backItem:RightLabel("~b~>>>")
+
+    minibarCustomItem.OnItemSelect = function(sender, item, index)
+        if item == removeItem then
+            ESX.TriggerServerCallback('hotel:getMinibar', function(minibar) 
+                for index,value in pairs(minibar) do
+                    if value.name == name then
+                        if value.amount > 0 then
+                            TriggerServerEvent("hotel:removeMinibarItem",tonumber(hotelroom),name,label)
+                            Wait(350)
+                            minibarCustomItem:Visible(false)
+                            OpenMinibar(hotelroom)
+                        else
+                            ESX.TextUI("There is no " ..label, "error")
+                            Wait(3500)
+                            ESX.HideUI()
+                        end
+                    end
+                end
+            end, hotelroom)
+        end
+        if item == backItem then
+            minibarCustomItem:Visible(false)
+            OpenMinibar(hotelroom)
+        end
+
+    end
+
+    _menuPool:RefreshIndex()
+    _menuPool:MouseControlsEnabled(false)
+    menu = minibarCustomItem 
+    minibarCustomItem:Visible(true)  
+
+end
+
+local developer = Config.HotelData.interrior.useMinibar
 
 function openRoomManager(hotelRoom, price)
     local roomManagerMenu = NativeUI.CreateMenu("Room " ..tostring(hotelRoom), "Welcome to the room manager, select an option")
@@ -236,12 +332,10 @@ function openRoomManager(hotelRoom, price)
     roomManagerMenu:AddItem(leaveItem)
 
     local minibarItem = NativeUI.CreateItem("Minibar managment", "~b~")
-    roomManagerMenu:AddItem(minibarItem)
+
     if developer then
         minibarItem:RightLabel("~b~>>>")
-    else
-        minibarItem:SetRightBadge(21)
-        minibarItem:Enabled(false)
+        roomManagerMenu:AddItem(minibarItem)
     end
     -- Set the Badge to minibaritem 21
 
@@ -309,12 +403,20 @@ function openRoomManager(hotelRoom, price)
             local retval = KeyboardInput('Enter "CONFIRM" to check out of the room ' ..tostring(hotelRoom), "", 7)
             menu:Visible(false)
             menu = {}
+            if retval == nil then
+                ESX.TextUI("You canceled the check-out process", "error")
+                Wait(3500)
+                ESX.HideUI()
+                return
+            end
             if string.lower(retval) == "confirm" then
                 TriggerServerEvent('hotel:checkout', tonumber(hotelRoom))
                 loaded = false
                 hotel = {}
             else
                 ESX.TextUI("You canceled the check-out process", "error")
+                Wait(3500)
+                ESX.HideUI()
             end
         end
     end

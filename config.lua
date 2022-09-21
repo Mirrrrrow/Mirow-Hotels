@@ -6,6 +6,8 @@ Config = {
         interrior = {
             position = vector3(151.3126, -1008.0188, -99.0000),
             heading = 2.7329,
+            useMinibar = true, --Enable Minibar?
+            minibarPosition = vector3(151.2918, -1003.5375, -98.9999),
         },
         MiniBar = {
             {
