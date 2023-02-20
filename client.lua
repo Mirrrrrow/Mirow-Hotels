@@ -45,7 +45,7 @@ CreateThread(function()
             if distance <= 2.0 then 
                 if not enterSend then
                     enterSend = true
-                    ESX.TextUI("Press ~g~E~s~, to enter the room", "info")
+                    ESX.TextUI(Config.Locales["EnterRoom"], "info")
                 end
                 if IsControlJustPressed(0, 38) then
                     TriggerServerEvent("hotel:enterRoom", hotel.id)
@@ -85,14 +85,14 @@ CreateThread(function()
             if distance <= 2.0 then 
                 if not exitSend then
                     exitSend = true
-                    ESX.TextUI("Press ~g~E~s~, to exit the room", "info")
+                    ESX.TextUI(Config.Locales["ExitRoom"], "info")
                 end
                 if IsControlJustPressed(0, 38) then
                     TriggerServerEvent("hotel:exitRoom", hotel.id)
                     Wait(250)
                     ESX.TriggerServerCallback('hotel:getRoomPosition', function(x,y,z) 
                         if x == false then 
-                            ESX.TextUI("Error, please contact an administrator", "error")
+                            ESX.TextUI(Config.Locales["ErrorAdmin"], "error")
                             Wait(3500)
                             ESX.HideUI()
                         else
@@ -139,7 +139,7 @@ CreateThread(function()
         if distance < 2.0 then
             if not notificationSend then
                 notificationSend = true
-                ESX.TextUI("Press ~g~E~s~, to interact with the receptionist", "info")
+                ESX.TextUI(Config.Locales["Receptionist"], "info")
             end
             if IsControlJustPressed(0,38) then
                 openMainMenu()

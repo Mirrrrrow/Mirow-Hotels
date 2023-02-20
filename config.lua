@@ -29,5 +29,11 @@ Config = {
                 amount = 0, -- Start Amount
             }
         }
+    },
+    Locales = {
+        ["EnterRoom"] = "Press ~g~E~s~, to enter the room",
+        ["ExitRoom"] = "Press ~g~E~s~, to exit the room",
+        ["ErrorAdmin"] = "Error, please contact an administrator",        
+        ["Receptionist"] = "Press g~E~s~, to talk to the receptionist",        
     }
 }
