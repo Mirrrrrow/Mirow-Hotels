@@ -34,6 +34,21 @@ Config = {
         ["EnterRoom"] = "Press ~g~E~s~, to enter the room",
         ["ExitRoom"] = "Press ~g~E~s~, to exit the room",
         ["ErrorAdmin"] = "Error, please contact an administrator",        
-        ["Receptionist"] = "Press g~E~s~, to talk to the receptionist",        
+        ["Receptionist"] = "Press g~E~s~, to talk to the receptionist",      
+        ["NativeUITitle"] = "Hotel",
+        ["NativeUIDescription"] = "Welcome to the hotel, please select an option!",
+        ["NativeUINoRoomRented"] = "No room rented",
+        ["NativeUIRoomRented"] = "Room rented:",
+        ["NativeUIRoomItem"] = "Room ",
+        ["NativeUINoFreeRooms"] = "No room available",
+        ["InputConfirmRenting"] = "Enter 'CONFIRM' to rent the Room %s for $%s / Payday",
+        ["InputConfirmRentingFalseText"] = "You didn't enter the correct text!",
+        ["RoomRentingSuccessfull"] = "You rented the room %s!",
+        ["RoomRentingError"] = "You can't rent this room!",
+        ["RoomRentingMoneyError"] = "You don't have enough money to rent this room!",
+        ["RoomMinibarWelcome"] = "Welcome to the minibar, please select an item!",
+        ["RoomMinibarAmount"] = "Amount:"
+
+
     }
 }

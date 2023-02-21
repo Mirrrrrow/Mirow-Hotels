@@ -156,15 +156,15 @@ end)
 
 
 function openMainMenu()
-    local mainMenu = NativeUI.CreateMenu("Hotel", "Welcome to the hotel, select an option")
+    local mainMenu = NativeUI.CreateMenu(Config.Locales["NativeUITitle"], Config.Locales["NativeUIDescription"])
     _menuPool:Add(mainMenu)
     ESX.TriggerServerCallback('hotel:getCurrentHotel', function(hotelRoom,hotelPrice) 
-        local noRoomItem = NativeUI.CreateItem("No room rented", "~b~")
+        local noRoomItem = NativeUI.CreateItem(Config.Locales["NativeUINoRoomRented"], "~b~")
         local roomItemOwn = nil
         if hotelRoom == 0 then
             mainMenu:AddItem(noRoomItem)
         else
-            roomItemOwn = NativeUI.CreateItem("Room rented:", "~b~")
+            roomItemOwn = NativeUI.CreateItem(Config.Locales["NativeUIRoomRented"], "~b~")
             roomItemOwn:RightLabel("~b~"..hotelRoom)
             mainMenu:AddItem(roomItemOwn)
             roomItemOwn.Activated = function(sender, item, index)
@@ -176,7 +176,7 @@ function openMainMenu()
         mainMenu:AddItem(placeholder)
         ESX.TriggerServerCallback('hotel:getFreeRooms', function(freeRooms) 
             for _,value in ipairs(freeRooms) do
-                local roomItem = NativeUI.CreateItem("Room " ..tostring(value.room), "~b~")
+                local roomItem = NativeUI.CreateItem(Config.Locales["NativeUIRoomItem"] ..tostring(value.room), "~b~")
                 roomItem:RightLabel("~b~>>>")
                 mainMenu:AddItem(roomItem)
                 roomItem.Activated = function(sender, item, index)
@@ -184,7 +184,7 @@ function openMainMenu()
                 end
             end
             if #freeRooms == 0 then
-                local noRoomItem = NativeUI.CreateItem("No rooms available", "~b~")
+                local noRoomItem = NativeUI.CreateItem(Config.Locales["NativeUINoFreeRooms"], "~b~")
                 mainMenu:AddItem(noRoomItem)
             end
 
@@ -201,11 +201,11 @@ end
 
 
 function openRoomMenu(hotelRoom,price)
-    local retval = KeyboardInput('Enter "CONFIRM" to rent the Room ' ..tostring(hotelRoom).. " for $" ..tostring(price).. " / Payday", "", 7)
+    local retval = KeyboardInput(Config.Locales["InputConfirmRenting"]:format(tostring(hotelRoom), tostring(price)), "", 7)
     menu:Visible(false)
     menu = {}
     if retval == nil then 
-        ESX.TextUI("You did not enter the correct text", "error") 
+        ESX.TextUI(Config.Locales["InputConfirmRentingFalseText"], "error") 
         Wait(3500)
         ESX.HideUI()
         return
@@ -214,33 +214,33 @@ function openRoomMenu(hotelRoom,price)
         ESX.TriggerServerCallback('hotel:rentRoom', function(data) 
             if data == "success" then
                 print('Success')
-                ESX.TextUI("You rented the room " ..tostring(hotelRoom), "success")
+                ESX.TextUI(Config.Locales["RoomRentingSuccessfull"]:format(hotelRoom), "success")
                 TriggerServerEvent("hotel:load")
                 TriggerServerEvent("hotel:loadCurrentRoom")
                 Wait(3500)
                 ESX.HideUI()
             elseif data == "owned" then
                 print('Owned')
-                ESX.TextUI("You can't rent this room", "error")
+                ESX.TextUI(Config.Locales["RoomRentingError"], "error")
                 Wait(3500)
                 ESX.HideUI()
             elseif data == "money" then
                 print('Money')
-                ESX.TextUI("You do not have enough money", "error")
+                ESX.TextUI(Config.Locales["RoomRentingMoneyError"], "error")
                 Wait(3500)
                 ESX.HideUI()
             end
 
         end,hotelRoom,price)
     else
-        ESX.TextUI("You did not enter the correct text", "error")
+        ESX.TextUI(Config.Locales["InputConfirmRentingFalseText"], "error")
         Wait(3500)
         ESX.HideUI()
     end
 end
 
 function OpenMinibar(hotelroom)
-    local minibarMenu = NativeUI.CreateMenu("Room " ..tostring(hotelroom), "Welcome to the minibar, select an item")
+    local minibarMenu = NativeUI.CreateMenu(Config.Locales["NativeUIRoomItem"] ..tostring(hotelroom), Config.Locales["RoomMinibarWelcome"])
     _menuPool:Add(minibarMenu)
     ESX.TriggerServerCallback('hotel:getMinibar', function(minibar) 
         for _, value in pairs(minibar) do
@@ -266,13 +266,13 @@ function OpenMinibar(hotelroom)
 end
 
 function OpenMinibarItem(hotelroom,name,label,amount)
-    local minibarCustomItem = NativeUI.CreateMenu("Room " ..tostring(hotelroom), "Welcome to the minibar, select an item")
+    local minibarCustomItem = NativeUI.CreateMenu(Config.Locales["NativeUIRoomItem"] ..tostring(hotelroom), Config.Locales["RoomMinibarWelcome"])
     _menuPool:Add(minibarCustomItem)
 
     local zero = (amount == 0)
     local color = (zero and "~r~" or "~g~")
 
-    local ammountitem = NativeUI.CreateItem("Amount:", "~b~")
+    local ammountitem = NativeUI.CreateItem(Config.Locales["RoomMinibarAmount"], "~b~")
     ammountitem:RightLabel(color..amount)
     minibarCustomItem:AddItem(ammountitem)
 
