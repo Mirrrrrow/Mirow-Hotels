@@ -276,13 +276,13 @@ function OpenMinibarItem(hotelroom,name,label,amount)
     ammountitem:RightLabel(color..amount)
     minibarCustomItem:AddItem(ammountitem)
 
-    local removeItem = NativeUI.CreateItem("Take 1x " ..label, "~b~")
+    local removeItem = NativeUI.CreateItem(Config.Locales["RoomMinibarRemove"] ..label, "~b~")
     minibarCustomItem:AddItem(removeItem)
 
     local placeholder = NativeUI.CreateItem('', '')
     minibarCustomItem:AddItem(placeholder)
 
-    local backItem = NativeUI.CreateItem("Back", "~b~")
+    local backItem = NativeUI.CreateItem(Config.Locales["RoomMinibarBack"], "~b~")
     minibarCustomItem:AddItem(backItem)
     backItem:RightLabel("~b~>>>")
 
@@ -297,7 +297,7 @@ function OpenMinibarItem(hotelroom,name,label,amount)
                             minibarCustomItem:Visible(false)
                             OpenMinibar(hotelroom)
                         else
-                            ESX.TextUI("There is no " ..label, "error")
+                            ESX.TextUI(COnfig.Locales["RoomMinibarNo"]:format(label), "error")
                             Wait(3500)
                             ESX.HideUI()
                         end

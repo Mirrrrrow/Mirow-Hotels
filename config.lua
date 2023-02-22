@@ -47,7 +47,10 @@ Config = {
         ["RoomRentingError"] = "You can't rent this room!",
         ["RoomRentingMoneyError"] = "You don't have enough money to rent this room!",
         ["RoomMinibarWelcome"] = "Welcome to the minibar, please select an item!",
-        ["RoomMinibarAmount"] = "Amount:"
+        ["RoomMinibarAmount"] = "Amount:",
+        ["RoomMinibarRemove"] = "Take 1x ",
+        ["RoomMinibarBack"] = "Back",
+        ["RoomMinibarNo"] = "There is no %s!"
 
 
     }
